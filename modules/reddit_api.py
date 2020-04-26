@@ -84,7 +84,7 @@ class RedditAPI(object):
         return before, after, limit
 
 
-    def new_posts(self, subreddit, before=None, after=None, limit=100):
+    def new_posts(self, subreddit, limit=100, before=None, after=None, count=None):
         """
         Returns posts sorted by new.
 
@@ -100,10 +100,11 @@ class RedditAPI(object):
             before=before,
             after=after,
             limit=limit,
+            count=count,
         ), headers=self._headers())
 
         response.raise_for_status()
         response_dictionary = json.loads(response.content)
         posts = [RedditPost.from_json(post["data"]) for post in response_dictionary["data"]["children"]]
-
-        return posts, before, after
+        
+        return posts, response_dictionary["data"]["before"], response_dictionary["data"]["after"]
