@@ -11,8 +11,8 @@ class Cache(object):
     """
     Saves, retrieves and indexes the downloaded reddit posts.
     """
-    def __init__(self, folder="data", cores=1, verbose=False, output_function=print):
-        self.folder = folder
+    def __init__(self, basepath="data", cores=1, verbose=False, output_function=print):
+        self.basepath = basepath
         self.cores = cores
         self.output_function = output_function
         self.verbose = verbose
@@ -31,18 +31,45 @@ class Cache(object):
         raise NotImplementedError
     
 
+    def _load_json_file(self, path):
+        with open(path, "r") as f:
+            data = json.load(f)
+        return data
+
+
     def update_index(self, subreddit):
         """
         Update the index file for a subreddit
         """
-        raise NotImplementedError
-        
+        index_path     = os.path.join(self.basepath, subreddit, "index.txt")
+        json_folder    = os.path.join(self.basepath, subreddit, "json")
+        json_filenames = [filename for filename in os.listdir(json_folder) if filename.endswith(".json")]
+        json_data      = [self._load_json_file(os.path.join(json_folder, filename)) for filename in json_filenames]
 
-    def update_all_indices(self, subreddit):
+        entries = [
+            f'[{post["id"]},{post["created"]},{post["created_utc"]},{post["ups"]},{post["downs"]},{post["view_count"]}'
+            for post in json_data
+        ]
+        entries.insert(0, "id,created,created_utc,ups,downs,view_count")
+
+        # write to file
+        with open(index_path, "w") as index:
+            for entry in entries:
+                index.write(entry)
+        
+        if self.verbose:
+            self.output_function(f"Updated index for r/{subreddit} ({len(json_filenames)} posts).")
+
+
+    def update_all_indices(self):
         """
         Update all the index files.
         """
-        raise NotImplementedError
+        subreddits = os.listdir(self.basepath)
+
+        # TODO : implement parallel execution?
+        for subreddit in subreddits:
+            self.update_index(subreddit)
 
 
     def add(self, data, overwrite=False):
@@ -60,23 +87,21 @@ class Cache(object):
             if not isinstance(post, RedditPost):
                 raise ValueError("'data' argument in Cache.add() must be a RedditPost instance or a list of RedditPost instances.")
 
-            dump = json.dumps(post.data, sort_keys=True, indent=4)
             path = self._get_json_path(post)
             older_file_exists = os.path.isfile(path)
-
-            if older_file_exists:
-                # file already exists
-                if overwrite == False:
-                    # we don't overwrite it
+            if older_file_exists: # file already exists
+                if overwrite == False: # we don't overwrite it
                     if self.verbose:
                         self.output_function(f"Already exists: r/{post.subreddit}/{post.id}.")
                     continue
 
             # write to the file
             self._create_directory_structure(path)
+            dump = json.dumps(post.data, sort_keys=True, indent=4)
             with open(path, "w") as f:
                 f.write(dump)
             
+            # announce the results
             if self.verbose and older_file_exists:
                 self.output_function(f"Overwritten r/{post.subreddit}/{post.id}.")
             
@@ -84,11 +109,22 @@ class Cache(object):
                 self.output_function(f"Saved r/{post.subreddit}/{post.id}.")
     
 
-    def _get_json_path(self, post=None, subreddit=None, post_id=None):
+    def _get_json_folder(self, subreddit=None):
         """
-        Generate path for a post.
+        Get a subreddit json storage folder path.
 
         Specify weither a post instance, or a subreddit/post_id pair
+
+        subreddit, str: subreddit name.
+        """
+        return os.path.join(self.basepath, subreddit, "json")
+    
+
+    def _get_json_path(self, post=None, subreddit=None, post_id=None):
+        """
+        Get a path for the post.
+
+        Specify either a post instance, or a subreddit/post_id pair
 
         post, RedditPost: the post intended to be saved.
 
@@ -103,7 +139,7 @@ class Cache(object):
         if subreddit is None or post_id is None:
             raise ValueError("Specify either a post instance, or a subreddit/post_id pair in Cache._get_json_path()")
 
-        return os.path.join(self.folder, subreddit, "json", f"{post_id}.json")
+        return os.path.join(self._get_json_folder(subreddit), f"{post_id}.json")
 
 
     def _create_directory_structure(self, path):
