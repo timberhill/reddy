@@ -11,7 +11,24 @@ class RedditPost(object):
         """
         data: JSON returned by Reddit API, containing a single post.
         """
+        if type(data) is not dict:
+            data = json.load(data)
+
         self.data = data
+
+
+    @classmethod
+    def from_json(cls, data):
+        return cls(data)
+
+
+    @classmethod
+    def from_file(cls, path):
+        with open(path, "r") as f:
+            data = json.load(f)
+
+        return cls.from_json(data)\
+
     
     @property
     def subreddit(self):
@@ -65,22 +82,6 @@ class RedditPost(object):
     def created_utc(self, datetime=True):
         return self._handle_timestamp(self.data["created_utc"]) if datetime == True else self.data["created_utc"]
 
-
-    @classmethod
-    def from_json(cls, data):
-        if type(data) is not dict:
-            data = json.loads(data)
-            
-        return cls(data)
-
-
-    @classmethod
-    def from_file(cls, path):
-        with open(path, "r") as f:
-            data = json.load(f)
-
-        return cls.from_json(data)
-    
 
     def _handle_timestamp(self, value):
         if type(value) is isinstance(value, datetime):
