@@ -3,6 +3,7 @@ import os
 import glob
 import json
 import pandas as pd
+from datetime import datetime, timezone
 
 from .containers import RedditPost
 
@@ -18,18 +19,43 @@ class Cache(object):
         self.verbose = verbose
     
 
-    def select(self, subreddit, datetime=None, utc=True):
+    def select(self, subreddit, t=None, tolerance=1):
         """
         Retrieve the posts from the cache.
 
         subreddit, str: subreddit name.
 
-        datetime, int/float/datetime/tuple: time or list of times as unix time or python datetime object (optional)
+        t, int/float/datetime/tuple: time or list of times as unix time or python datetime object in UTC (optional)
 
-        utc, bool: is time parameter specified in UTC (default: True)
+        tolerance, int: tolerance for the time/date if only one number is specified, in seconds (default: 10 seconds)
         """
-        raise NotImplementedError
-    
+        index_path = os.path.join(self.basepath, subreddit, "index.txt")
+        posts = pd.read_csv(index_path, header=0, sep=",")
+
+        if t is None:
+            return posts
+
+        isnumber   = lambda obj: isinstance(t, int) or isinstance(t, float)
+        tounixtime = lambda obj: obj.replace(tzinfo=timezone.utc).timestamp()
+        
+        if isnumber(t):
+            # this is unix time
+            t = (t-tolerance, t+tolerance)
+        elif isinstance(t, datetime):
+            # this is a datetime object
+            unix_time = tounixtime(t)
+            t = (unix_time-tolerance, unix_time+tolerance)
+        elif isinstance(t, tuple) and isinstance(t[0], datetime) and isinstance(t[1], datetime):
+            # this is a datetime range
+            t = (tounixtime(t[0]), tounixtime(t[1]))
+        elif isinstance(t, tuple) and isnumber(t[0]) and isnumber(t[1]):
+            pass
+        else:
+            raise ValueError("Wrong value encountered in cache.select(t=???). Use datetime object or unix time, or a tuple.")
+        
+        mask = (posts["created_utc"] >= t[0]) & (posts["created_utc"] <= t[1])
+        return posts.where(mask).dropna(axis=0, how='any') 
+
 
     def _load_json_file(self, path):
         with open(path, "r") as f:
@@ -50,7 +76,7 @@ class Cache(object):
             f'\n{post["id"]},{post["created"]},{post["created_utc"]},{post["ups"]},{post["downs"]},{post["view_count"]}'
             for post in json_data
         ]
-        entries.insert(0, "id,created,created_utc,ups,downs,view_count")
+        entries.insert(0, "post_id,created,created_utc,ups,downs,view_count")
 
         # write to file
         with open(index_path, "w") as index:
