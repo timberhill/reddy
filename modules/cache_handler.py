@@ -29,7 +29,7 @@ class Cache(object):
 
         tolerance, int: tolerance for the time/date if only one number is specified, in seconds (default: 10 seconds)
         """
-        index_path = os.path.join(self.basepath, subreddit, "index.txt")
+        index_path = os.path.join(self.basepath, subreddit.lower(), "index.txt")
         posts = pd.read_csv(index_path, header=0, sep=",")
 
         if t is None:
@@ -67,8 +67,8 @@ class Cache(object):
         """
         Update the index file for a subreddit
         """
-        index_path     = os.path.join(self.basepath, subreddit, "index.txt")
-        json_folder    = os.path.join(self.basepath, subreddit, "json")
+        index_path     = os.path.join(self.basepath, subreddit.lower(), "index.txt")
+        json_folder    = os.path.join(self.basepath, subreddit.lower(), "json")
         json_filenames = [filename for filename in os.listdir(json_folder) if filename.endswith(".json")]
         json_data      = [self._load_json_file(os.path.join(json_folder, filename)) for filename in json_filenames]
 
@@ -143,7 +143,7 @@ class Cache(object):
 
         subreddit, str: subreddit name.
         """
-        return os.path.join(self.basepath, subreddit, "json")
+        return os.path.join(self.basepath, subreddit.lower(), "json")
     
 
     def _get_json_path(self, post=None, subreddit=None, post_id=None):
