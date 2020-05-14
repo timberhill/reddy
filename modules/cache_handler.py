@@ -54,7 +54,7 @@ class Cache(object):
             raise ValueError("Wrong value encountered in cache.select(t=???). Use datetime object or unix time, or a tuple.")
         
         mask = (posts["created_utc"] >= t[0]) & (posts["created_utc"] <= t[1])
-        return posts.where(mask).dropna(axis=0, how='any') 
+        return posts.where(mask).dropna(axis=0, how='any')
 
 
     def _load_json_file(self, path):
