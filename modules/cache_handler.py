@@ -47,7 +47,7 @@ class Cache(object):
         json_data      = [self._load_json_file(os.path.join(json_folder, filename)) for filename in json_filenames]
 
         entries = [
-            f'[{post["id"]},{post["created"]},{post["created_utc"]},{post["ups"]},{post["downs"]},{post["view_count"]}'
+            f'\n{post["id"]},{post["created"]},{post["created_utc"]},{post["ups"]},{post["downs"]},{post["view_count"]}'
             for post in json_data
         ]
         entries.insert(0, "id,created,created_utc,ups,downs,view_count")
