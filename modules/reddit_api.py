@@ -89,8 +89,11 @@ class RedditAPI(object):
         Returns posts sorted by new.
 
         subreddit, str: name of the subreddit.
+
         before, str:    ID of the previous page
+
         after, str:     ID of the next page
+
         limit, int:     number of posts to return (1-100)
         """
         before, after, limit = self._validate_paging_arguments(before, after, limit)
@@ -108,3 +111,36 @@ class RedditAPI(object):
         posts = [RedditPost.from_json(post["data"]) for post in response_dictionary["data"]["children"]]
         
         return posts, response_dictionary["data"]["before"], response_dictionary["data"]["after"]
+
+
+    # def search(self, subreddit, query, limit=100, before=None, after=None, count=None):
+    #     """
+    #     Search API client.
+
+    #     Can be used to load all 
+
+    #     subreddit, str: name of the subreddit.
+
+    #     query, str:     search query
+
+    #     before, str:    ID of the previous page
+
+    #     after, str:     ID of the next page
+
+    #     limit, int:     number of posts to return (1-100)
+    #     """
+    #     before, after, limit = self._validate_paging_arguments(before, after, limit)
+    #     base_url = f"https://oauth.reddit.com/r/{subreddit}/search"
+        
+    #     response = requests.get(base_url, dict(
+    #         q=query,
+    #         before=before,
+    #         after=after,
+    #         limit=limit,
+    #         count=count,
+    #     ), headers=self._headers())
+
+    #     response.raise_for_status()
+    #     response_dictionary = json.loads(response.content)
+    #     posts = [RedditPost.from_json(post["data"]) for post in response_dictionary["data"]["children"]]
+        
