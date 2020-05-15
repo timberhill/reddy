@@ -15,6 +15,7 @@ matplotlib.rc('font', **font)
 def plot_date_histogram(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
     colours = ["#64a587", "#446b50", "#010101"]
     alphas = [1, 0.6, 0.6]
+    binsize = bins[1] - bins[0]
 
     year_start = datetime(2020, 1, 1, 0,0,0,0)
     getdays  = lambda t: (t-year_start).days + (t-year_start).seconds/(3600*24)
@@ -28,6 +29,12 @@ def plot_date_histogram(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=
         days_some = [getdays(t) for t in posts.where(posts["ups"] > ulim).dropna(axis=0, how='any')["created_utc_obj"]]
         y, x = np.histogram(days_some, bins=bins)
         x = 0.5 * (x[1:] + x[:-1])
+        if y[0] != 0:
+            x = np.insert(x, 0, bins[0]-binsize)
+            y = np.insert(y, 0, 0)
+        if y[-1] != 0:
+            x = np.insert(y, -1, bins[-1]+binsize)
+            y = np.insert(y, -1, 0)
         ax.fill(x, y, c=colours[i], alpha=alphas[i], lw=0, label=f"upvotes > {ulim}")
 
     ax.set_xticks([0, 15, 31, 46, 60, 75, 91, 106, 121, 136, 152])
