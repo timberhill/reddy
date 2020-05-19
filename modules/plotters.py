@@ -12,7 +12,7 @@ font = {
 matplotlib.rc('font', **font)
 
 
-def plot_date_histogram(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
+def plot_submission_frequency_histogram(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
     colours = ["#64a587", "#446b50", "#010101"]
     alphas = [1, 0.6, 0.6]
 

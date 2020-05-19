@@ -19,7 +19,7 @@ class Cache(object):
         self.verbose = verbose
     
 
-    def select(self, subreddit, t=None, tolerance=1):
+    def where(self, subreddit, t=None, tolerance=1):
         """
         Retrieve the posts from the cache.
 
