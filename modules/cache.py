@@ -12,12 +12,12 @@ class Cache(object):
     """
     Saves, retrieves and indexes the downloaded reddit posts.
     """
-    def __init__(self, basepath="data", cores=1, verbose=False, output_function=print):
+    def __init__(self, basepath="../data", cores=1, verbose=False, output_function=print):
         self.basepath = basepath
         self.cores = cores
         self.output_function = output_function
         self.verbose = verbose
-    
+
 
     def where(self, subreddit, t=None, tolerance=1):
         """
@@ -29,7 +29,10 @@ class Cache(object):
 
         tolerance, int: tolerance for the time/date if only one number is specified, in seconds (default: 10 seconds)
         """
-        index_path = os.path.join(self.basepath, subreddit.lower(), "index.txt")
+        if not self._index_exists(subreddit):
+            raise FileNotFoundError(f"Could not find an index file for r/{subreddit}.")
+
+        index_path = self._get_index_path(subreddit)
         posts = pd.read_csv(index_path, header=0, sep=",")
 
         if t is None:
@@ -146,6 +149,17 @@ class Cache(object):
         return os.path.join(self.basepath, subreddit.lower(), "json")
     
 
+    def _get_index_path(self, subreddit=None):
+        """
+        Get a subreddit json storage folder path.
+
+        Specify weither a post instance, or a subreddit/post_id pair
+
+        subreddit, str: subreddit name.
+        """
+        return os.path.join(self.basepath, subreddit.lower(), "index.txt")
+    
+
     def _get_json_path(self, post=None, subreddit=None, post_id=None):
         """
         Get a path for the post.
@@ -166,6 +180,13 @@ class Cache(object):
             raise ValueError("Specify either a post instance, or a subreddit/post_id pair in Cache._get_json_path()")
 
         return os.path.join(self._get_json_folder(subreddit), f"{post_id}.json")
+
+
+    def _index_exists(self, subreddit):
+        """
+        Check if the index file exists.
+        """
+        return os.path.isfile(self._get_index_path(subreddit))
 
 
     def _create_directory_structure(self, path):

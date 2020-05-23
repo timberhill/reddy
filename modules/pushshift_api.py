@@ -68,6 +68,4 @@ class PushshiftAPI(object):
         response.raise_for_status()
         response_dictionary = json.loads(response.content)
 
-        print(f"PUSHSHIFT API : RETRIEVED {len(response_dictionary['data'])} POSTS")
-
         return [PushShiftPost(data) for data in response_dictionary["data"]]
