@@ -2,6 +2,7 @@ import json
 import requests
 import warnings
 from datetime import datetime, timedelta
+from collections.abc import Iterable
 
 from .containers import RedditPost
 
@@ -148,3 +149,34 @@ class RedditAPI(object):
         response_dictionary = json.loads(response.content)
         posts = [RedditPost.from_json(post["data"]) for post in response_dictionary["data"]["children"]]
         return posts, before, after
+    
+
+    def info(self, subreddit, item, url=None):
+        """
+        Retrieve info on a post/comment/subreddit, see https://www.reddit.com/dev/api/#GET_api_info
+
+        Fullnames info: https://www.reddit.com/dev/api/#fullnames (subreddits start with 't3_')
+
+        subreddit, str: name of the subreddit.
+
+        item, str/list:  a comma-separated list of thing fullnames
+
+        url, str: a valid URL
+        """
+        if isinstance(item, Iterable):
+            item = ",".join(item)
+
+        if len(item.split(",")) > 100 or len(item.split(",")) == 0:
+            raise ValueError("Reddit API /r/[subreddit]/api/info can only return between 0 and 100 items per request.")
+
+        base_url = f"https://oauth.reddit.com/r/{subreddit}/api/info"
+        response = requests.get(base_url, dict(
+            id=item,
+            url=url
+        ), headers=self._headers())
+
+        response.raise_for_status()
+        response_dictionary = json.loads(response.content)
+
+        posts = [RedditPost.from_json(post["data"]) for post in response_dictionary["data"]["children"]]
+        return posts
