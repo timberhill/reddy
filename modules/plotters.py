@@ -12,7 +12,7 @@ font = {
 matplotlib.rc('font', **font)
 
 
-def plot_submission_frequency_histogram(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
+def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
     colours = ["#64a587", "#446b50", "#010101"]
     alphas = [1, 0.6, 0.6]
     binsize = bins[1] - bins[0]
@@ -67,6 +67,8 @@ def plot_submission_frequency_histogram(title, posts, upvote_limits=[0,], figsiz
 
     ax.set_xlabel("Date")
     ax.set_ylabel("N")
+
+    ax.set_xlim(0, getdays(datetime.utcnow()))
 
     handles, labels = ax.get_legend_handles_labels()
     handles.append(line)
