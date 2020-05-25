@@ -11,13 +11,18 @@ class RedditAPI(object):
     """
     Simple wrapper for some Reddit API.
     See https://www.reddit.com/dev/api
+
+    NOTE: If you're using this service outside the code in github.com/timberhill/reddy, please use your own API credentials.
+
+    client_id, str: Reddit API client ID, optional
+
+    secret, str: Reddit API client secret, optional
     """
-    def __init__(self):
+    def __init__(self, client_id=None, secret=None):
         self._access_token = None
         self._access_token_deadline = None
 
-        self._client_id = None
-        self._secret    = None
+        self.authenticate(client_id, secret)
 
 
     def _headers(self):
@@ -28,12 +33,29 @@ class RedditAPI(object):
         return header
 
 
-    def authenticate(self, client_id, secret, scope="read"):
+    def authenticate(self, client_id=None, secret=None, scope="read"):
         """
         OAuth2, see https://github.com/reddit-archive/reddit/wiki/OAuth2
+
+        NOTE: If you're using this service outside the code in github.com/timberhill/reddy, please use your own API credentials.
+
+        client_id, str: Reddit API client ID, optional
+
+        secret, str: Reddit API client secret, optional
         """
+        if client_id is None or secret is None:
+            from cryptography.fernet import Fernet
+            with \
+                open("../modules/bin/62608e08adc29a8d6dbc9754e659f125", "rb") as a, \
+                open("../modules/bin/3c6e0b8a9c15224a8228b9a98ca1531d", "rb") as b, \
+                open("../modules/bin/5ebe2294ecd0e0f08eab7690d2a6ee69", "rb") as c:
+                f = Fernet(b.read()[4:-3])
+                ab, cb = f.decrypt(a.read()[4:-3]), f.decrypt(c.read()[4:-3])
+        
         # following this example:
         # https://github.com/reddit-archive/reddit/wiki/OAuth2-Python-Example
+        client_id = client_id if client_id is not None else ab.decode("utf-8")
+        secret = secret if secret is not None else cb.decode("utf-8")
         client_auth = requests.auth.HTTPBasicAuth(client_id, secret)
         post_data = {
             "grant_type":   "client_credentials",
@@ -56,9 +78,6 @@ class RedditAPI(object):
             self._access_token_deadline = \
                 datetime.utcnow() \
                 + timedelta(seconds=response_dictionary["expires_in"])
-            
-            self._client_id = client_id
-            self._secret = secret
         else:
             raise KeyError("'access_token' was not returned by the server.")
 
