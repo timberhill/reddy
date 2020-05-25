@@ -13,8 +13,8 @@ matplotlib.rc('font', **font)
 
 
 def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
-    colours = ["#64a587", "#446b50", "#010101"]
-    alphas = [1, 0.6, 0.6]
+    colours = ["#092327", "#4F6D7A", "#9EA3B0"]
+    alphas = [0.7, 0.7, 0.7]
     binsize = bins[1] - bins[0]
 
     year_start = datetime(2020, 1, 1, 0,0,0,0)
@@ -43,7 +43,10 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
             x = np.insert(y, -1, bins[-1]+binsize)
             y = np.insert(y, -1, 0)
 
-        ax.fill(x, y, c=colours[i], alpha=alphas[i], lw=0, label=f"upvotes > {ulim}")
+        lw = 4 if i == 0 else 3
+        ls = "-" if i == 0 else "-"
+
+        ax.step(x, y, where="mid", c=colours[i], alpha=alphas[i], lw=lw, ls=ls, label=f"upvotes > {ulim}")
 
     ax.set_xticks([0, 15, 31, 46, 60, 75, 91, 106, 121, 136, 152])
     ax.set_xticklabels(["Jan 1", "15", "Feb 1", "15", "Mar 1", "15", "Apr 1", "15", "May 1", "15", "June 1"])
@@ -55,8 +58,7 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     def plot_vline(ax, date, label="", color="#f17b77", yoffset=0.5, fontsize=12, alpha=1):
         date_days = getdays(date)
         line = ax.axvline(date_days, c=color, alpha=alpha, zorder=-1)
-        ax.text(date_days+0.7, ax.get_ylim()[1]-yoffset, label, color=color, va="top", 
-            fontsize=fontsize, alpha=alpha)
+        # ax.text(date_days+0.7, ax.get_ylim()[1]-yoffset, label, color=color, va="top", fontsize=fontsize, alpha=alpha)
         return ax, line
     
     lockdown_dates = load_national_lockdown_list()
@@ -77,7 +79,7 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     ax.set_xlabel("Date")
     ax.set_ylabel("Number of submissions relative to the first week of 2020")
 
-    ax.set_xlim(0, getdays(datetime.utcnow()))
+    ax.set_xlim(0, getdays(datetime.utcnow()) - 7)
 
     handles, labels = ax.get_legend_handles_labels()
     handles.append(line)
