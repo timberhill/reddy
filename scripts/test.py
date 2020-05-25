@@ -11,9 +11,9 @@ from modules import load_posts, plot_submission_frequency_histogram_2020
 
 if __name__ == "__main__":
 
-    subreddit_name = "skyrim"
+    subreddit_name = "analog"
     daterange = [
-        datetime.utcnow().timestamp(),
+        datetime(2020, 5, 1, 0, 0, 0).timestamp(), # 
         datetime(2020, 1, 1, 0, 0, 0).timestamp()
     ]
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     rapi  = RedditAPI()
 
     # cache.update_index(subreddit_name)
-    # load_posts(subreddit_name, daterange, papi, rapi, cache)
+    load_posts(subreddit_name, daterange, papi, rapi, cache)
     posts = cache.where(subreddit_name, t=None)
 
     f, ax = plot_submission_frequency_histogram_2020(f"Posts from r/{subreddit_name}", posts, upvote_limits=[0, 10, 100])
