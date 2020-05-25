@@ -22,6 +22,7 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
 
     posts["created_utc_obj"] = posts.apply(lambda row: datetime.utcfromtimestamp(row["created_utc"]), axis=1)
     days_all = [getdays(t) for t in posts["created_utc_obj"]]
+    baseline = None
 
     f, ax = plt.subplots(1, 1, figsize=(12, 8))
     f.suptitle(title, ha="left", x=0.125, y=0.93)
@@ -29,6 +30,11 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
         days_some = [getdays(t) for t in posts.where(posts["ups"] > ulim).dropna(axis=0, how='any')["created_utc_obj"]]
         y, x = np.histogram(days_some, bins=bins)
         x = 0.5 * (x[1:] + x[:-1])
+
+        if baseline is None:
+            baseline = np.mean(y[(x >= 0) & (x <= 60)])
+
+        y = 100 * y / baseline # normalize
 
         if y[0] != 0:
             x = np.insert(x, 0, bins[0]-binsize)
@@ -56,6 +62,9 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     lockdown_dates = load_national_lockdown_list()
     for i, row in lockdown_dates.iterrows():
         ax, line = plot_vline(ax, row["Start"].to_pydatetime(), alpha=0.5)
+    
+    # plot baseline
+    ax.axhline(100, color="k", ls="--", lw=1, alpha=0.6)
 
     # labels = ["New York", "United Kingdom", "Australia"]
     # labeled_dates = lockdown_dates.where(lockdown_dates["State"].isin(labels)).dropna(axis=0, how='any')
@@ -66,7 +75,7 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     #     yoffset += 2
 
     ax.set_xlabel("Date")
-    ax.set_ylabel("N")
+    ax.set_ylabel("Number of submissions relative to the first week of 2020")
 
     ax.set_xlim(0, getdays(datetime.utcnow()))
 
