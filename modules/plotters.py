@@ -32,7 +32,8 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
         x = 0.5 * (x[1:] + x[:-1])
 
         if baseline is None:
-            baseline = np.mean(y[(x >= 0) & (x <= 60)])
+            sample = y[(x >= 0) & (x <= 31)]
+            baseline = np.mean(sample) if len(sample) > 0 else np.mean(y)
 
         y = 100 * y / baseline # normalize
 

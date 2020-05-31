@@ -68,7 +68,9 @@ class Cache(object):
 
     def update_index(self, subreddit):
         """
-        Update the index file for a subreddit
+        Update the index file for a 
+        
+        subreddit, str: subreddit name
         """
         index_path     = os.path.join(self.basepath, subreddit.lower(), "index.txt")
         json_folder    = os.path.join(self.basepath, subreddit.lower(), "json")
@@ -136,7 +138,7 @@ class Cache(object):
             
             if self.verbose and not older_file_exists:
                 self.output_function(f"Saved r/{post.subreddit}/{post.id}.")
-    
+
 
     def _get_json_folder(self, subreddit=None):
         """

@@ -86,7 +86,7 @@ class RedditAPI(object):
         time_now = datetime.utcnow()
         if time_now >= self._access_token_deadline:
             # token expired, get a new one
-            self.authenticate(self._client_id, self._secret)
+            self.authenticate()
 
 
     def _validate_paging_arguments(self, before, after, limit):
