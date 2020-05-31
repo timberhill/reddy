@@ -20,8 +20,6 @@ def load_newest_posts(subreddit_name, rapi, cache, n=1000):
         count += len(posts)
         epochs += [post.created_utc for post in posts]
 
-    cache.update_index(subreddit_name)
-
     return min(epochs)
 
 
@@ -76,10 +74,8 @@ def load_posts(subreddit_name, epochrange, papi, rapi, cache, progress=True):
         # load the posts
         for subset in id_subsets:
             posts = rapi.info(subreddit_name, subset)
-            cache.add(posts, overwrite=True)
+            cache.add(posts)
 
             if progress:
                 t = datetime.fromtimestamp(min([post.created_utc for post in posts]))
                 print(f"Loaded {len(posts)} posts, oldest: {t}")
-
-    cache.update_index(subreddit_name)

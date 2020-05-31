@@ -18,6 +18,24 @@ class Cache(object):
         self.output_function = output_function
         self.verbose = verbose
 
+    
+    @property
+    def _headers(self):
+        return [
+            "post_id",
+            "author",
+            "subreddit_subscribers",
+            "title",
+            "downs",
+            "ups",
+            "num_comments",
+            "total_awards_received",
+            "view_count",
+            "created",
+            "created_utc",
+            "permalink",
+        ]
+
 
     def where(self, subreddit, t=None, tolerance=1):
         """
@@ -33,7 +51,7 @@ class Cache(object):
             raise FileNotFoundError(f"Could not find an index file for r/{subreddit}.")
 
         index_path = self._get_index_path(subreddit)
-        posts = pd.read_csv(index_path, header=0, sep=",")
+        posts = pd.read_feather(index_path, columns=self._headers)
 
         if t is None:
             return posts
@@ -60,129 +78,57 @@ class Cache(object):
         return posts.where(mask).dropna(axis=0, how='any')
 
 
-    def _load_json_file(self, path):
-        with open(path, "r") as f:
-            data = json.load(f)
-        return data
-
-
-    def update_index(self, subreddit):
-        """
-        Update the index file for a 
-        
-        subreddit, str: subreddit name
-        """
-        index_path     = os.path.join(self.basepath, subreddit.lower(), "index.txt")
-        json_folder    = os.path.join(self.basepath, subreddit.lower(), "json")
-        json_filenames = [filename for filename in os.listdir(json_folder) if filename.endswith(".json")]
-        json_data      = [self._load_json_file(os.path.join(json_folder, filename)) for filename in json_filenames]
-
-        entries = [
-            f'\n{post["id"]},{post["created"]},{post["created_utc"]},{post["ups"]},{post["downs"]},{post["view_count"]}'
-            for post in json_data
-        ]
-        entries.insert(0, "post_id,created,created_utc,ups,downs,view_count")
-
-        # write to file
-        with open(index_path, "w") as index:
-            for entry in entries:
-                index.write(entry)
-        
-        if self.verbose:
-            self.output_function(f"Updated index for r/{subreddit} ({len(json_filenames)} posts).")
-
-
-    def update_all_indices(self):
-        """
-        Update all the index files.
-        """
-        subreddits = os.listdir(self.basepath)
-
-        # TODO : implement parallel execution?
-        for subreddit in subreddits:
-            self.update_index(subreddit)
-
-
-    def add(self, data, overwrite=False):
+    def add(self, posts):
         """
         Add post(s) to the cache (== save the json files)
 
         data, list/RedditPost: reddit posts ot a list of reddit posts.
-
-        update, bool: overwrite existing files witht the new data or not (defult: False)
         """
-        if not isinstance(data, Iterable):
-            data = [data,]
+        if not isinstance(posts, Iterable):
+            posts = [posts,]
         
-        for post in data:
-            if not isinstance(post, RedditPost):
-                raise ValueError("'data' argument in Cache.add() must be a RedditPost instance or a list of RedditPost instances.")
+        subreddits = set([post.subreddit for post in posts])
+        
+        for subreddit in subreddits:
+            subreddit_posts = [post for post in posts if post.subreddit == subreddit]
+            index_path = self._get_index_path(subreddit)
 
-            path = self._get_json_path(post)
-            older_file_exists = os.path.isfile(path)
-            if older_file_exists: # file already exists
-                if overwrite == False: # we don't overwrite it
-                    if self.verbose:
-                        self.output_function(f"Already exists: r/{post.subreddit}/{post.id}.")
-                    continue
+            if self._index_exists(subreddit): # get or create a dataframe
+                old_dataframe = pd.read_feather(index_path, columns=self._headers)
+            else:
+                self._create_directory_structure(index_path)
+                old_dataframe = pd.DataFrame(data=None, columns=self._headers)
 
-            # write to the file
-            self._create_directory_structure(path)
-            dump = json.dumps(post.data, sort_keys=True, indent=4)
-            with open(path, "w") as f:
-                f.write(dump)
-            
-            # announce the results
-            if self.verbose and older_file_exists:
-                self.output_function(f"Overwritten r/{post.subreddit}/{post.id}.")
-            
-            if self.verbose and not older_file_exists:
-                self.output_function(f"Saved r/{post.subreddit}/{post.id}.")
+            new_dataframe = pd.concat([
+                old_dataframe, 
+                pd.DataFrame({
+                    "post_id": [post.id for post in subreddit_posts],
+                    "author":  [post.author for post in subreddit_posts],
+                    "subreddit_subscribers": [post.subreddit_subscribers for post in subreddit_posts],
+                    "title":   [post.title for post in subreddit_posts],
+                    "downs":   [post.downs for post in subreddit_posts],
+                    "ups":     [post.ups for post in subreddit_posts],
+                    "num_comments": [post.num_comments for post in subreddit_posts],
+                    "total_awards_received": [post.total_awards_received for post in subreddit_posts],
+                    "view_count":  [post.view_count for post in subreddit_posts],
+                    "created":     [post.created for post in subreddit_posts],
+                    "created_utc": [post.created_utc for post in subreddit_posts],
+                    "permalink":   [post.permalink for post in subreddit_posts],
+                }, columns=self._headers)
+            ]).drop_duplicates(['post_id'], keep='last')
 
+            # save to file
+            new_dataframe.reset_index().to_feather(index_path)
 
-    def _get_json_folder(self, subreddit=None):
-        """
-        Get a subreddit json storage folder path.
-
-        Specify weither a post instance, or a subreddit/post_id pair
-
-        subreddit, str: subreddit name.
-        """
-        return os.path.join(self.basepath, subreddit.lower(), "json")
-    
 
     def _get_index_path(self, subreddit=None):
         """
-        Get a subreddit json storage folder path.
-
-        Specify weither a post instance, or a subreddit/post_id pair
+        Get a subreddit data file path.
 
         subreddit, str: subreddit name.
         """
-        return os.path.join(self.basepath, subreddit.lower(), "index.txt")
+        return os.path.join(self.basepath, subreddit.lower(), "index.feather")
     
-
-    def _get_json_path(self, post=None, subreddit=None, post_id=None):
-        """
-        Get a path for the post.
-
-        Specify either a post instance, or a subreddit/post_id pair
-
-        post, RedditPost: the post intended to be saved.
-
-        subreddit, str: subreddit name.
-
-        post_id, str: ID of the reddit post.
-        """
-        if post is not None:
-            subreddit = post.subreddit
-            post_id   = post.id
-        
-        if subreddit is None or post_id is None:
-            raise ValueError("Specify either a post instance, or a subreddit/post_id pair in Cache._get_json_path()")
-
-        return os.path.join(self._get_json_folder(subreddit), f"{post_id}.json")
-
 
     def _index_exists(self, subreddit):
         """
