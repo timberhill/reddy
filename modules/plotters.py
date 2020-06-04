@@ -90,12 +90,26 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     return f, ax
 
 
-def plot_submission_time_histogram(title, posts, figsize=(12, 8), 
-        bins=np.arange(0, 24, 1), 
+def plot_submission_time_histogram(title, posts, figsize=(12, 8),
         metric="number", 
         main_range=(datetime(2020,4,1,0,0,0), datetime.utcnow()), 
         reference_range=(datetime(2020,1,1,0,0,0), datetime(2020,2,1,0,0,0)),
         success_score=100):
+    """
+    Plot a metric as a function of time of day (1 hour bins)
+
+    metric, str: Y axis metric, one of:
+                 post_number - number of posts submitted (default)
+                 comment_number - number of comments in all posts
+                 upvote_number - number of all upvotes
+                 success - fraction of 'successful' posts
+
+    main_range, tuple: main data date range (red line)
+
+    reference_range, tuple: reference data date range (dotted line)
+    
+    success_score, int: upvote threshold for a post to be considered successful
+    """
 
     colours = ["#A71D31", "#40434E", "#9EA3B0"]
     alphas = [1, 1, 0.7]
@@ -124,8 +138,31 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
         main_slice = main_posts.where(posts.int_hour_utc == h).dropna(how="all")
         reference_slice = reference_posts.where(posts.int_hour_utc == h).dropna(how="all")
         
-        main_y[i]      = 100 * len(main_slice.where(main_slice.ups > 100).dropna(how="all").index) / len(main_slice.index)
-        reference_y[i] = 100 * len(reference_slice.where(reference_slice.ups > 100).dropna(how="all").index) / len(reference_slice.index)
+        if metric == "post_number":
+            ylabel = "Number of posts"
+            main_y[i]      = len(main_slice.index)
+            reference_y[i] = len(reference_slice.index)
+
+        elif metric == "comment_number":
+            ylabel = "Number of comments"
+            main_y[i]      = main_slice.num_comments.sum()
+            reference_y[i] = reference_slice.num_comments.sum()
+
+        elif metric == "upvote_number":
+            ylabel = "Number of upvotes"
+            main_y[i]      = main_slice.ups.sum()
+            reference_y[i] = reference_slice.ups.sum()
+
+        elif metric == "success":
+            ylabel = f"Fraction of posts with score > {success_score}, %"
+            main_y[i] = 100 \
+                * len(main_slice.where(main_slice.ups > success_score).dropna(how="all").index) \
+                / len(main_slice.index)
+            reference_y[i] = 100 \
+                * len(reference_slice.where(reference_slice.ups > success_score).dropna(how="all").index) \
+                / len(reference_slice.index)
+        else:
+            raise ValueError("Unexpected value encountered for 'metric' argument in plotters.plot_submission_time_histogram()")
 
     # to handle step plot edges
     hours = np.append(hours, 24)
@@ -140,8 +177,8 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
 
     ax.set_xticks(np.arange(0, 26, 2))
 
-    ax.set_xlabel("Submission time")
-    ax.set_ylabel("Score")
+    ax.set_xlabel("Submission time (UTC)")
+    ax.set_ylabel(ylabel)
 
     ax.set_xlim(0, 24)
     ax.legend()

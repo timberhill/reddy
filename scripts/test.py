@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     posts = cache.where(subreddit_name, t=None)
 
-    f, ax = plot_submission_time_histogram(f"Posts from r/{subreddit_name}", posts, success_score=50)
+    f, ax = plot_submission_time_histogram(f"Posts from r/{subreddit_name}", posts, metric="success", success_score=100)
     plt.show()
 
     f, ax = plot_submission_frequency_histogram_2020(f"Posts from r/{subreddit_name}", posts, upvote_limits=[0, 50])
