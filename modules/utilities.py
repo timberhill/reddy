@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 
 def load_newest_posts(subreddit_name, rapi, cache, n=1000):
@@ -46,6 +47,25 @@ def load_pushshift_post_ids(papi, subreddit_name, epochrange):
     return ids
 
 
+def send_request(request_function, retries=3, progress=True, wait=30):
+    retry = 0
+    result = None
+    while retry <= retries:
+        try:
+            result = request_function()
+            break
+        except Exception as e:
+            retry += 1
+            if progress and retry == retries:
+                print(f"Error occured in API request:\n{e}\n\nSkipping.")
+            elif progress and retry <= retries:
+                print(f"Error occured in API request:\n{e}\n\nRetrying in {wait}s...")
+                time.sleep(wait)
+
+    return result
+
+
+
 def load_posts(subreddit_name, epochrange, papi, rapi, cache, progress=True):
     """
     Load post IDs between dates using Pushshift API and then load full info from Reddit API.
@@ -60,22 +80,37 @@ def load_posts(subreddit_name, epochrange, papi, rapi, cache, progress=True):
 
     """
     ids = []
+    epoch_diff = 1000
     oldest_epoch = epochrange[0]
     while oldest_epoch > epochrange[1]:
         # load the IDs
-        posts = papi.search(subreddit_name, before=int(oldest_epoch), limit=500)
-        oldest_epoch = min([post.created_utc for post in posts])
-        ids = [f"t3_{post.id}" for post in posts]
+        ps_posts = send_request(
+            lambda: papi.search(subreddit_name, before=int(oldest_epoch), limit=500),
+            retries=5, progress=progress
+        )
 
-        # divide the posts into chunks of 100
+        if len(ps_posts) == 0:
+            oldest_epoch += epoch_diff
+            continue
+
+        ps_created_utc = [post.created_utc for post in ps_posts]
+        epoch_diff = max(ps_created_utc) - min(ps_created_utc)
+
+        ids = [f"t3_{post.id}" for post in ps_posts]
         n = 100 # number of post ids per request (redit api limitation)
         id_subsets = [ids[i*n : (i+1)*n] for i in range((len(ids)+n-1)//n)]
 
         # load the posts
         for subset in id_subsets:
-            posts = rapi.info(subreddit_name, subset)
+            posts = send_request(
+                lambda: rapi.info(subreddit_name, subset),
+                retries=5, progress=progress
+            )
+            if posts is None:
+                continue
+
             cache.add(posts)
+            oldest_epoch = min([post.created_utc for post in posts])
 
             if progress:
-                t = datetime.fromtimestamp(min([post.created_utc for post in posts]))
-                print(f"Loaded {len(posts)} posts, oldest: {t}")
+                print(f"Loaded {len(posts)} posts, oldest: {datetime.fromtimestamp(oldest_epoch)}")
