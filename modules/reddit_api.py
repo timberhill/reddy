@@ -42,6 +42,8 @@ class RedditAPI(object):
         client_id, str: Reddit API client ID, optional
 
         secret, str: Reddit API client secret, optional
+
+        scope, str: API scope, default: "read"
         """
         if client_id is None or secret is None:
             from cryptography.fernet import Fernet
@@ -116,6 +118,7 @@ class RedditAPI(object):
 
         limit, int:     number of posts to return (1-100)
         """
+        self.verify_authentication()
         before, after, limit = self._validate_paging_arguments(before, after, limit)
         base_url = f"https://oauth.reddit.com/r/{subreddit}/new"
         
@@ -149,6 +152,7 @@ class RedditAPI(object):
 
         limit, int:     number of posts to return (1-100)
         """
+        self.verify_authentication()
         before, after, limit = self._validate_paging_arguments(before, after, limit)
         base_url = f"https://oauth.reddit.com/r/{subreddit}/search"
         
@@ -182,6 +186,8 @@ class RedditAPI(object):
 
         url, str: a valid URL
         """
+        self.verify_authentication()
+        
         if isinstance(item, Iterable):
             item = ",".join(item)
 
