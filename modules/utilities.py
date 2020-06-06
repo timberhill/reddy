@@ -82,7 +82,7 @@ def load_posts(subreddit_name, epochrange, papi, rapi, progress=True):
 
     """
     ids = []
-    epoch_diff = 1000
+    epoch_diff = 1000 # how much unix time to skip if the API is stuck
     oldest_epoch = epochrange[0]
     while oldest_epoch > epochrange[1]:
         # load the IDs

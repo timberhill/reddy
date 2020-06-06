@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from .lockdown_start import load_national_lockdown_list
@@ -62,8 +61,8 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
         return ax, line
     
     lockdown_dates = load_national_lockdown_list()
-    for i, row in lockdown_dates.iterrows():
-        ax, line = plot_vline(ax, row["Start"].to_pydatetime(), alpha=0.5)
+    for t in lockdown_dates["Start"]:
+        ax, line = plot_vline(ax, t, alpha=0.5)
     
     # plot baseline
     ax.axhline(100, color="k", ls="--", lw=1, alpha=0.6)
