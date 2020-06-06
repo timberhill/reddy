@@ -55,7 +55,6 @@ class PushShiftPost(object):
             raise ValueError(f"Invalid time format/value encountered: {value}.")
 
 
-
 class RedditPost(object):
     """
     Reddit post container with properties from the json.
@@ -93,13 +92,10 @@ class RedditPost(object):
     
     @property
     def author_premium(self):
-        return self.data["author_premium"]
+        return self.data["author_premium"] if "author_premium" in self.data is not None else False
 
     @property
     def subreddit(self):
-        return self.data["subreddit"]
-    @property
-    def subreddit_id(self):
         return self.data["subreddit"]
 
     @property
@@ -147,14 +143,23 @@ class RedditPost(object):
         return self.data["url"]
     
     @property
-    def created(self, datetime=False):
-        return self._handle_timestamp(self.data["created"]) if datetime == True else self.data["created"]
+    def created(self):
+        return self.data["created"]
     
     @property
-    def created_utc(self, datetime=False):
-        return self._handle_timestamp(self.data["created_utc"]) if datetime == True else self.data["created_utc"]
+    def created_utc(self):
+        return self.data["created_utc"]
+    
+    @property
+    def created_datetime(self):
+        return self._handle_timestamp(self.data["created"])
+    
+    @property
+    def created_utc_datetime(self):
+        return self._handle_timestamp(self.data["created_utc"])
 
     def _handle_timestamp(self, value):
+        # not used for now
         if type(value) is isinstance(value, datetime):
             return value
         elif type(value) is float or type(value) is int:

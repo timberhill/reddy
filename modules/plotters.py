@@ -20,14 +20,13 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     year_start = datetime(2020, 1, 1, 0,0,0,0)
     getdays  = lambda t: (t-year_start).days + (t-year_start).seconds/(3600*24)
 
-    posts["created_utc_obj"] = posts.apply(lambda row: datetime.utcfromtimestamp(row["created_utc"]), axis=1)
-    days_all = [getdays(t) for t in posts["created_utc_obj"]]
+    days_all = [getdays(post.created_utc_datetime) for post in posts]
     baseline = None
 
     f, ax = plt.subplots(1, 1, figsize=figsize)
     f.suptitle(title, ha="left", x=0.125, y=0.93)
     for i, ulim in enumerate(upvote_limits):
-        days_some = [getdays(t) for t in posts.where(posts["ups"] > ulim).dropna(axis=0, how='all')["created_utc_obj"]]
+        days_some = [getdays(post.created_utc_datetime) for post in posts if post.ups > ulim]
         y, x = np.histogram(days_some, bins=bins)
         x = 0.5 * (x[1:] + x[:-1])
 
@@ -94,15 +93,16 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
         metric="number", 
         main_range=(datetime(2020,4,1,0,0,0), datetime.utcnow()), 
         reference_range=(datetime(2020,1,1,0,0,0), datetime(2020,2,1,0,0,0)),
-        success_score=100):
+        success_score=100,
+        utc=False):
     """
     Plot a metric as a function of time of day (1 hour bins)
 
     metric, str: Y axis metric, one of:
                  post_number - number of posts submitted (default)
-                 comment_number - number of comments in all posts
-                 upvote_number - number of all upvotes
-                 success - fraction of 'successful' posts
+                 comments_per_post - number of comments in all posts
+                 upvotes_per_post - number of all upvotes
+                 success - fraction of 'successful' posts (upvotes > success_score)
 
     main_range, tuple: main data date range (red line)
 
@@ -114,53 +114,44 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
     colours = ["#A71D31", "#40434E", "#9EA3B0"]
     alphas = [1, 1, 0.7]
 
-    def post_decimal_hour_utc(post):
-        d = datetime.fromtimestamp(post.created_utc)
-        return d.hour + d.minute/60 + d.second/3600
-    
-    posts["decimal_hour_utc"] = posts.apply(post_decimal_hour_utc, axis=1)
-    posts["int_hour_utc"] = posts.apply(lambda post: datetime.fromtimestamp(post.created_utc).hour, axis=1)
+    main_posts = [
+        post for post in posts 
+        if (post.created_utc > main_range[0].timestamp()) & 
+           (post.created_utc < main_range[1].timestamp())
+    ]
+    reference_posts = [
+        post for post in posts 
+        if (post.created_utc > reference_range[0].timestamp()) & 
+           (post.created_utc < reference_range[1].timestamp())
+    ]
 
-    main_posts = posts.where(
-            (posts.created_utc > main_range[0].timestamp()) & 
-            (posts.created_utc < main_range[1].timestamp())
-        ).dropna(how="all")
-
-    reference_posts = posts.where(
-            (posts.created_utc > reference_range[0].timestamp()) & 
-            (posts.created_utc < reference_range[1].timestamp())
-        ).dropna(how="all")
-        
     hours = np.arange(0, 24, 1)
     main_y = np.zeros_like(hours)
     reference_y = np.zeros_like(hours)
     for i, h in enumerate(hours):
-        main_slice = main_posts.where(posts.int_hour_utc == h).dropna(how="all")
-        reference_slice = reference_posts.where(posts.int_hour_utc == h).dropna(how="all")
+        get_hour = lambda post: post.created_utc_datetime.hour if utc else post.created_datetime.hour
+        main_slice      = [post for post in main_posts      if get_hour(post) == h]
+        reference_slice = [post for post in reference_posts if get_hour(post) == h]
         
         if metric == "post_number":
             ylabel = "Number of posts"
-            main_y[i]      = len(main_slice.index)
-            reference_y[i] = len(reference_slice.index)
+            main_y[i]      = len(main_slice)
+            reference_y[i] = len(reference_slice)
 
-        elif metric == "comment_number":
+        elif metric == "comments_per_post":
             ylabel = "Number of comments"
-            main_y[i]      = main_slice.num_comments.sum()
-            reference_y[i] = reference_slice.num_comments.sum()
+            main_y[i]      = np.median([post.num_comments for post in main_slice])
+            reference_y[i] = np.median([post.num_comments for post in reference_slice])
 
-        elif metric == "upvote_number":
-            ylabel = "Number of upvotes"
-            main_y[i]      = main_slice.ups.sum()
-            reference_y[i] = reference_slice.ups.sum()
+        elif metric == "upvotes_per_post":
+            ylabel = "Upvotes per post"
+            main_y[i]      = np.median([post.ups for post in main_slice])
+            reference_y[i] = np.median([post.ups for post in reference_slice])
 
         elif metric == "success":
-            ylabel = f"Fraction of posts with score > {success_score}, %"
-            main_y[i] = 100 \
-                * len(main_slice.where(main_slice.ups > success_score).dropna(how="all").index) \
-                / len(main_slice.index)
-            reference_y[i] = 100 \
-                * len(reference_slice.where(reference_slice.ups > success_score).dropna(how="all").index) \
-                / len(reference_slice.index)
+            ylabel = f"Percentge of posts with score > {success_score}"
+            main_y[i]      = 100 * len([post.ups for post in main_slice      if post.ups > success_score]) / len(main_slice)
+            reference_y[i] = 100 * len([post.ups for post in reference_slice if post.ups > success_score]) / len(reference_slice)
         else:
             raise ValueError("Unexpected value encountered for 'metric' argument in plotters.plot_submission_time_histogram()")
 
@@ -177,7 +168,8 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
 
     ax.set_xticks(np.arange(0, 26, 2))
 
-    ax.set_xlabel("Submission time (UTC)")
+    timezone = "UTC" if utc else "Local"
+    ax.set_xlabel(f"Submission time ({timezone})")
     ax.set_ylabel(ylabel)
 
     ax.set_xlim(0, 24)
