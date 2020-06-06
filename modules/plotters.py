@@ -93,7 +93,8 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
         main_range=(datetime(2020,4,1,0,0,0), datetime.utcnow()), 
         reference_range=(datetime(2020,1,1,0,0,0), datetime(2020,2,1,0,0,0)),
         success_score=100,
-        utc=False):
+        utc=False,
+        average_method="mean"):
     """
     Plot a metric as a function of time of day (1 hour bins)
 
@@ -109,6 +110,10 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
     
     success_score, int: upvote threshold for a post to be considered successful
     """
+    if average_method == "mean":
+        average_method = np.mean
+    elif average_method == "median":
+        average_method = np.median
 
     colours = ["#A71D31", "#40434E", "#9EA3B0"]
     alphas = [1, 1, 0.7]
@@ -139,13 +144,13 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
 
         elif metric == "comments_per_post":
             ylabel = "Number of comments"
-            main_y[i]      = np.median([post.num_comments for post in main_slice])
-            reference_y[i] = np.median([post.num_comments for post in reference_slice])
+            main_y[i]      = average_method([post.num_comments for post in main_slice])
+            reference_y[i] = average_method([post.num_comments for post in reference_slice])
 
         elif metric == "upvotes_per_post":
             ylabel = "Upvotes per post"
-            main_y[i]      = np.median([post.ups for post in main_slice])
-            reference_y[i] = np.median([post.ups for post in reference_slice])
+            main_y[i]      = average_method([post.ups for post in main_slice])
+            reference_y[i] = average_method([post.ups for post in reference_slice])
 
         elif metric == "success":
             ylabel = f"Percentge of posts with score > {success_score}"
