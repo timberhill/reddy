@@ -6,12 +6,12 @@ from .lockdown_start import load_national_lockdown_list
 import matplotlib
 font = {
     'family' : 'DejaVu Sans',
-    'size'   : 9
+    'size'   : 16
 }
 matplotlib.rc('font', **font)
 
 
-def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 3)):
+def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], figsize=(12, 8), bins=np.arange(0, 180, 7)):
     colours = ["#092327", "#4F6D7A", "#9EA3B0"]
     alphas = [0.7, 0.7, 0.7]
     binsize = bins[1] - bins[0]
