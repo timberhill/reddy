@@ -76,9 +76,9 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
     #     yoffset += 2
 
     ax.set_xlabel("Date")
-    ax.set_ylabel("Number of submissions relative to the first week of 2020")
+    ax.set_ylabel("Number of submissions relative to January 2020")
 
-    ax.set_xlim(0, getdays(datetime.utcnow()) - 7)
+    ax.set_xlim(0, getdays(datetime.utcnow())-binsize)
 
     handles, labels = ax.get_legend_handles_labels()
     handles.append(line)
@@ -90,7 +90,7 @@ def plot_submission_frequency_histogram_2020(title, posts, upvote_limits=[0,], f
 
 def plot_submission_time_histogram(title, posts, figsize=(12, 8),
         metric="number", 
-        main_range=(datetime(2020,4,1,0,0,0), datetime.utcnow()), 
+        main_range=(datetime(2020,4,1,0,0,0), datetime(2020,5,1,0,0,0)), 
         reference_range=(datetime(2020,1,1,0,0,0), datetime(2020,2,1,0,0,0)),
         success_score=100,
         utc=False,
@@ -99,9 +99,9 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
     Plot a metric as a function of time of day (1 hour bins)
 
     metric, str: Y axis metric, one of:
-                 post_number - number of posts submitted (default)
-                 comments_per_post - number of comments in all posts
-                 upvotes_per_post - number of all upvotes
+                 posts - number of posts submitted (default)
+                 comments - number of comments in all posts
+                 upvotes - number of all upvotes
                  success - fraction of 'successful' posts (upvotes > success_score)
 
     main_range, tuple: main data date range (red line)
@@ -143,7 +143,7 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
             reference_y[i] = len(reference_slice)
 
         elif metric == "comments":
-            ylabel = "Number of comments"
+            ylabel = "Comments per post"
             main_y[i]      = average_method([post.num_comments for post in main_slice])
             reference_y[i] = average_method([post.num_comments for post in reference_slice])
 
@@ -153,7 +153,7 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
             reference_y[i] = average_method([post.ups for post in reference_slice])
 
         elif metric == "success":
-            ylabel = f"Percentge of posts with score > {success_score}"
+            ylabel = f"Percentge of posts with upvotes > {success_score}"
             main_y[i]      = np.sum([1.0 for post in main_slice      if post.ups > success_score]) / len(main_slice)
             reference_y[i] = np.sum([1.0 for post in reference_slice if post.ups > success_score]) / len(reference_slice)
 
