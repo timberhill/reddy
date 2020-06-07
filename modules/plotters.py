@@ -130,32 +130,33 @@ def plot_submission_time_histogram(title, posts, figsize=(12, 8),
     ]
 
     hours = np.arange(0, 24, 1)
-    main_y = np.zeros_like(hours)
-    reference_y = np.zeros_like(hours)
+    main_y      = np.zeros_like(hours, dtype=np.float)
+    reference_y = np.zeros_like(hours, dtype=np.float)
     for i, h in enumerate(hours):
         get_hour = lambda post: post.created_utc_datetime.hour if utc else post.created_datetime.hour
         main_slice      = [post for post in main_posts      if get_hour(post) == h]
         reference_slice = [post for post in reference_posts if get_hour(post) == h]
         
-        if metric == "post_number":
+        if metric == "posts":
             ylabel = "Number of posts"
             main_y[i]      = len(main_slice)
             reference_y[i] = len(reference_slice)
 
-        elif metric == "comments_per_post":
+        elif metric == "comments":
             ylabel = "Number of comments"
             main_y[i]      = average_method([post.num_comments for post in main_slice])
             reference_y[i] = average_method([post.num_comments for post in reference_slice])
 
-        elif metric == "upvotes_per_post":
+        elif metric == "upvotes":
             ylabel = "Upvotes per post"
             main_y[i]      = average_method([post.ups for post in main_slice])
             reference_y[i] = average_method([post.ups for post in reference_slice])
 
         elif metric == "success":
             ylabel = f"Percentge of posts with score > {success_score}"
-            main_y[i]      = 100 * len([post.ups for post in main_slice      if post.ups > success_score]) / len(main_slice)
-            reference_y[i] = 100 * len([post.ups for post in reference_slice if post.ups > success_score]) / len(reference_slice)
+            main_y[i]      = np.sum([1.0 for post in main_slice      if post.ups > success_score]) / len(main_slice)
+            reference_y[i] = np.sum([1.0 for post in reference_slice if post.ups > success_score]) / len(reference_slice)
+
         else:
             raise ValueError("Unexpected value encountered for 'metric' argument in plotters.plot_submission_time_histogram()")
 
