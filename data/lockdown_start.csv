@@ -1,0 +1,121 @@
+Country,State,Start,End,Level
+Albania,Albania, 2020-03-13[1],,National
+Algeria,Algeria, 2020-03-23[2], 2020-05-14[3],City
+Argentina,Argentina, 2020-03-19[4], 2020-05-24[5],National
+Armenia,Armenia, 2020-03-24[6], 2020-05-04[7],National
+Australia,Australia, 2020-03-23[8],,National
+Austria,Austria, 2020-03-16[9], 2020-04-13[10],National
+Azerbaijan,Azerbaijan, 2020-03-31[11], 2020-04-20[11],National
+Bangladesh,Bangladesh, 2020-03-26[12], 2020-05-16[13],National
+Barbados,Barbados, 2020-03-28[14], 2020-05-03[14],National
+Belgium,Belgium, 2020-03-18[15], 2020-04-19[16],National
+Bermuda,Bermuda, 2020-04-04[17], 2020-05-02[18],National
+Bolivia,Bolivia, 2020-03-22[19], 2020-04-15[19],National
+Botswana,Botswana, 2020-04-02[20], 2020-04-30[20],National
+Brazil,Santa Catarina, 2020-03-17[21], 2020-04-07[21],State
+Brazil,São Paulo, 2020-03-24[22], 2020-05-10[23],State
+Chile,Chile, 2020-03-19[24],,National
+Colombia,Colombia, 2020-03-25[25], 2020-05-11[26],National
+Republic of the Congo,Republic of the Congo, 2020-03-31[27], 2020-04-20[27],National
+Costa Rica,Costa Rica, 2020-03-23[28],,National
+Croatia,Croatia, 2020-03-18[29], 2020-04-19[30],National
+Cuba,Cuba, 2020-03-23[31], 2020-04-20[31],National
+Czech Republic,Czech Republic, 2020-03-16[9], 2020-04-12[32],National
+Denmark,Denmark, 2020-03-11[33], 2020-04-13[33],National
+Dominican Republic,Dominican Republic, 2020-03-19[34],,National
+Ecuador,Ecuador, 2020-03-16[35], 2020-03-31[35],National
+El Salvador,El Salvador, 2020-03-12[36], 2020-04-02[36],National
+Eritrea,Eritrea, 2020-04-02[37], 2020-04-23[37],National
+Fiji,Lautoka, 2020-03-20[38], 2020-04-07[39],City
+Fiji,Suva, 2020-04-03[40], 2020-04-17[41],City
+Finland,Uusimaa, 2020-03-27[42], 2020-04-16[42],Region
+France,France, 2020-03-17[43], 2020-05-11[44],National
+Georgia,Georgia, 2020-03-31[45], 2020-04-21[45],National
+Germany,Germany, 2020-03-23[a][47], 2020-04-20[48]to  2020-05-10[49],National
+Ghana,Accra, 2020-03-30[50], 2020-04-12[51],Metropolitan Area
+Ghana,Kumasi, 2020-03-30[50], 2020-04-12[51],Metropolitan Area
+Greece,Greece, 2020-03-23[52], 2020-05-04[53],National
+Guernsey,Guernsey, 2020-03-25[54],,National
+Honduras,Honduras, 2020-03-20[55], 2020-05-17[56],National
+Hungary,Hungary, 2020-03-28[57], 2020-04-10[57],National
+India,India, 2020-03-25[58], 2020-05-18[59],National
+Iran,Iran, 2020-03-14[60], 2020-04-20[61],National
+Iraq,Iraq, 2020-03-22[62], 2020-04-11[63],National
+Ireland,Ireland, 2020-03-12[64], 2020-05-18[65],National
+Israel,Bnei Brak, 2020-04-02[66],,City
+Italy,Italy, 2020-03-09[b][67], 2020-05-03[c][68],National
+Jamaica,Saint Catherine, 2020-04-15[69], 2020-04-22[69],Parish
+Jordan,Jordan, 2020-03-18[70], 2020-04-30[71],National
+Kosovo,Kosovo, 2020-03-14[72], 2020-05-04 [73],National
+Kuwait,Kuwait, 2020-03-14[74], 2020-03-29[74],National
+Lebanon,Lebanon, 2020-03-15[75], 2020-03-28[75],National
+Liberia,Margibi, 2020-03-23[76], 2020-04-11[76],County
+Liberia,Montserrado, 2020-03-23[76], 2020-04-11[76],County
+Libya,Libya, 2020-03-22[77],,National
+Lithuania,Lithuania, 2020-03-16[78], 2020-04-27[79],National
+Luxembourg,Luxembourg, 2020-03-18[80], 2020-04-20 to  2020-05-25[81],National
+Madagascar,Antananarivo, 2020-03-23[82], 2020-04-20[83],City
+Madagascar,Toamasina, 2020-03-23[82], 2020-04-20[83],City
+Malaysia,Malaysia, 2020-03-18[84], 2020-06-09[85],National
+Mongolia,Mongolia, 2020-03-10[86], 2020-03-16[86],National
+Montenegro,Tuzi, 2020-03-24[87],,Municipality
+Morocco,Morocco, 2020-03-19[88], 2020-04-20[89],National
+Namibia,Namibia, 2020-03-27[d][90], 2020-05-04[91],National
+Nepal,Nepal, 2020-03-24[92], 2020-04-15[93],National
+Netherlands,Netherlands, 2020-03-16[94], 2020-04-28[95],National
+New Zealand,New Zealand, 2020-03-26[96], 2020-05-14[97],National
+Nigeria,Abuja, 2020-03-30[98], 2020-04-12[98],City
+Nigeria,Lagos, 2020-03-30[98], 2020-04-12[98],City
+Nigeria,Ogun, 2020-03-30[98], 2020-04-12[98],State
+Northern Cyprus,Northern Cyprus, 2020-03-30[99],,National
+Norway,Norway, 2020-03-12[100], 2020-04-13[100],National
+Oman,Muscat, 2020-04-10[101], 2020-05-29[102],Governorate
+Oman,Jalan Bani Bu Ali, 2020-04-16[103],TBD[103],Province
+Pakistan,Pakistan, 2020-03-24[104], 2020-05-09[105],National
+Panama,Panama, 2020-03-25[106],,National
+Papua New Guinea,Papua New Guinea, 2020-03-24[107], 2020-04-07[107],National
+Paraguay,Paraguay, 2020-03-20[108], 2020-04-12[109],National
+Peru,Peru, 2020-03-16[110], 2020-05-24[111],National
+Philippines,Cebu, 2020-03-27[112], 2020-05-15[e][113]to  2020-05-31[f][114],Province
+Philippines,Davao Region, 2020-03-19[115], 2020-05-15[113],Region
+Philippines,Luzon, 2020-03-15[g][116], 2020-04-30[h][117]to  2020-05-15[i][118]to  2020-05-31[f][114],Island group
+Philippines,Soccsksargen, 2020-03-23[115],,Region
+Poland,Poland, 2020-03-13[119], 2020-04-11[120],National
+Portugal,Portugal, 2020-03-19[121], 2020-04-02[120],National
+Qatar,Doha Industrial Area, 2020-03-11[122],,Industrial park
+Romania,Romania, 2020-03-25[123], 2020-05-12[124],National
+Russia,Moscow, 2020-03-30[125], 2020-05-12[126][127],Metropolitan area
+Russia,Rest of the country[j], 2020-03-28[128], 2020-04-30[128],National
+Rwanda,Rwanda, 2020-03-21[129], 2020-04-19[130],National
+Samoa,Samoa, 2020-03-26[131], 2020-04-08[132],National
+San Marino,San Marino, 2020-03-14[133], 2020-05-05[134],National
+Saudi Arabia,Jeddah, 2020-03-29[135],,City
+Saudi Arabia,Mecca, 2020-03-26[135],,City
+Saudi Arabia,Medina, 2020-03-26[135],,City
+Saudi Arabia,Qatif, 2020-03-09[136],,Area
+Saudi Arabia,Riyadh, 2020-03-26[135],,City
+Serbia,Serbia, 2020-03-15[120], 2020-04-21[137]to  2020-05-04[138],National
+Singapore,Singapore, 2020-04-07[139], 2020-06-01[140],National
+Slovakia,Slovakia, 2020-03-16[141], 2020-04-22[142],National
+South Africa,South Africa, 2020-03-26[143], 2020-04-30[144],National
+Spain,Spain, 2020-03-14[145], 2020-05-09[146],National
+Switzerland,Switzerland, 2020-03-17[147], 2020-04-27 to  2020-05-11[148],National
+Thailand,Thailand, 2020-03-25[149], 2020-05-31[150],National
+Trinidad and Tobago,Trinidad and Tobago, 2020-03-17[151], 2020-03-31[151],National
+Tunisia,Tunisia, 2020-03-22[152], 2020-04-19[153],National
+Turkey,Turkey, 2020-04-23[154], 2020-04-27[154],National[k]
+Ukraine,Ukraine, 2020-03-17[120], 2020-04-24[120],National
+United Arab Emirates,United Arab Emirates, 2020-03-26[155], 2020-04-17[156],National
+United Kingdom,United Kingdom, 2020-03-23[157],,National
+United States,California, 2020-03-19[158],,State
+United States,Clark County NV, 2020-03-20[159],,County
+United States,Connecticut, 2020-03-23[160], 2020-04-22[161],State
+United States,Illinois, 2020-03-21[162], 2020-05-30[163],State
+United States,Kansas City KS, 2020-03-24[164], 2020-04-19[165],City
+United States,Massachusetts, 2020-03-24[166], 2020-05-04[166],State
+United States,Michigan, 2020-03-24[167], 2020-04-13[161],State
+United States,New York, 2020-03-20[168], 2020-05-15[169],State
+United States,Oregon, 2020-03-24[170],,State
+United States,Wisconsin, 2020-03-24[171],,State
+Venezuela,Venezuela, 2020-03-17[172], 2020-05-13[173],National
+Zimbabwe,Zimbabwe, 2020-03-30[174], 2020-05-02[175],National

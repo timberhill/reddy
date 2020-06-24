@@ -1,9 +1,10 @@
-# config file
+# config files
 modules/config.py
-
-.vscode/
-data/
 credentials.py
+
+# defult database path
+data/reddy.db
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
