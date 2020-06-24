@@ -11,7 +11,11 @@ from .containers import RedditPost
 
 
 class DataContext(object):
-    def __init__(self, path="../data/reddy.db", profiler=False):
+    def __init__(self, path=None, profiler=False):
+        if path is None:
+            from .config import db_path
+            path = db_path
+
         self.path = path
         self.engine = create_engine(f"sqlite:///{path}", echo=profiler)
         Base.metadata.bind = self.engine
