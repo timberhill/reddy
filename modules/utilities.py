@@ -147,7 +147,11 @@ def load_posts(subreddit_name, epochrange, papi, rapi, progress=True):
                 f"ETA: {h:0.0f}h {m:0.0f}m {s:0.0f}s",
             end='\r')
 
+
+    timeused = time_since_start.total_seconds()
+    m, s = divmod(timeused, 60)
+    h, m = divmod(m, 60)
     print(
         f"[r/{subreddit_name}] " + \
-        f"Downloaded {posts_loaded} posts in {time_since_start}                           "
+        f"Downloaded {posts_loaded} posts in {h:0.0f}h {m:0.0f}m {s:0.0f}s                           "
     )
