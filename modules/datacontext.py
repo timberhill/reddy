@@ -1,7 +1,7 @@
 import os
 import sys
 
-from sqlalchemy import create_engine, Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy import create_engine, Column, ForeignKey, Integer, Float, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 Base = declarative_base()
@@ -13,8 +13,8 @@ from .containers import RedditPost
 class DataContext(object):
     def __init__(self, path=None, profiler=False):
         if path is None:
-            from .config import db_path
-            path = db_path
+            from .config import Config
+            path = Config().db_path
 
         self.path = path
         self.engine = create_engine(f"sqlite:///{path}", echo=profiler)
@@ -24,6 +24,7 @@ class DataContext(object):
 
         DBSession = sessionmaker(bind=self.engine)
         self.session = DBSession()
+
 
     def __enter__(self):
         return self
@@ -130,7 +131,9 @@ class DataContext(object):
                 if daterange[1] is not None:
                     query = query.filter(Post.created <= daterange[1])
         if not include_removed:
-            query = query.filter(Post.selftext != "[removed]")
+            query = query.filter(Post.removed == False)
+        
+        query = query.order_by(Post.created_utc)
 
         return [self._post_entry_to_model(entry) for entry in query.all()]
 
@@ -146,10 +149,12 @@ class DataContext(object):
         target.title           = target.title if source.title==source.title else source.title
         target.downs           = target.downs if source.downs==source.downs else source.downs
         target.ups             = target.ups if source.ups==source.ups else source.ups
+        target.upvote_ratio    = target.upvote_ratio if source.upvote_ratio==source.upvote_ratio else source.upvote_ratio
+        target.score           = target.score if source.score==source.score else source.score
         target.selftext        = target.selftext if source.selftext==source.selftext else source.selftext
+        target.removed         = target.removed if source.removed==source.removed else source.removed
         target.num_comments    = target.num_comments if source.num_comments==source.num_comments else source.num_comments
         target.total_awards_received = target.total_awards_received if source.total_awards_received==source.total_awards_received else source.total_awards_received
-        target.view_count      = target.view_count if source.view_count==source.view_count else source.view_count
         # target.permalink       = target.permalink if source.permalink==source.permalink else source.permalink
         # target.url             = target.url if source.url==source.url else source.url
         # target.created         = target.created if source.created==source.created else source.created
@@ -170,10 +175,12 @@ class DataContext(object):
         entry.title           = redditpost.title
         entry.downs           = redditpost.downs
         entry.ups             = redditpost.ups
+        entry.upvote_ratio    = redditpost.upvote_ratio
+        entry.score           = redditpost.score
         entry.selftext        = redditpost.selftext
+        entry.removed         = redditpost.removed
         entry.num_comments    = redditpost.num_comments
         entry.total_awards_received = redditpost.total_awards_received
-        entry.view_count      = redditpost.view_count
         entry.permalink       = redditpost.permalink
         entry.url             = redditpost.url
         entry.created         = redditpost.created
@@ -195,10 +202,12 @@ class DataContext(object):
             "title"          : entry.title,
             "downs"          : entry.downs,
             "ups"            : entry.ups,
+            "upvote_ratio"   : entry.upvote_ratio,
+            "score"          : entry.score,
             "selftext"       : entry.selftext,
+            "removed"        : entry.removed,
             "num_comments"   : entry.num_comments,
             "total_awards_received" : entry.total_awards_received,
-            "view_count"     : entry.view_count,
             "permalink"      : entry.permalink,
             "url"            : entry.url,
             "created"        : entry.created,
@@ -207,18 +216,18 @@ class DataContext(object):
 
 
 class Subreddit(Base):
-    __tablename__ = 'subreddit'
+    __tablename__ = 'subreddits'
 
     id   = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False, unique=True)
  
  
 class Post(Base):
-    __tablename__ = 'post'
+    __tablename__ = 'posts'
     
     id             = Column(Integer, primary_key=True)
 
-    subreddit_id   = Column(Integer, ForeignKey('subreddit.id'))
+    subreddit_id   = Column(Integer, ForeignKey('subreddits.id'))
     subreddit      = relationship(Subreddit)
 
     post_id        = Column(String(10), nullable=False, unique=True)
@@ -228,10 +237,12 @@ class Post(Base):
     title          = Column(String(250))
     downs          = Column(Integer)
     ups            = Column(Integer)
+    upvote_ratio   = Column(Float)
+    score          = Column(Integer)
     selftext       = Column(String(1000))
+    removed        = Column(Boolean, default=False)
     num_comments   = Column(Integer)
     total_awards_received = Column(Integer)
-    view_count     = Column(Integer)
     permalink      = Column(String(250))
     url            = Column(String(250))
     created        = Column(Integer)

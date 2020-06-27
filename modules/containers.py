@@ -82,74 +82,16 @@ class RedditPost(object):
         return cls.from_json(data)
 
 
-    @property
-    def id(self):
-        return self.data["id"]
-    
-    @property
-    def author(self):
-        return self.data["author"]
-    
-    @property
-    def author_premium(self):
-        return self.data["author_premium"] if "author_premium" in self.data is not None else False
+    def __getattr__(self, property_name):
+        if property_name not in self.data:
+            return None
 
+        return self.data[property_name]
+    
     @property
-    def subreddit(self):
-        return self.data["subreddit"]
+    def removed(self):
+        return self.data["selftext"] == "[removed]"
 
-    @property
-    def subreddit_subscribers(self):
-        return self.data["subreddit_subscribers"]
-    
-    @property
-    def title(self):
-        return self.data["title"]
-    
-    @property
-    def downs(self):
-        return self.data["downs"]
-    
-    @property
-    def ups(self):
-        return self.data["ups"]
-    
-    @property
-    def selftext(self):
-        return self.data["selftext"]
-    
-    @property
-    def num_comments(self):
-        return self.data["num_comments"]
-    
-    @property
-    def total_awards_received(self):
-        return self.data["total_awards_received"]
-    
-    @property
-    def all_awardings(self):
-        return self.data["all_awardings"]
-    
-    @property
-    def view_count(self):
-        return self.data["view_count"]
-    
-    @property
-    def permalink(self):
-        return self.data["permalink"]
-    
-    @property
-    def url(self):
-        return self.data["url"]
-    
-    @property
-    def created(self):
-        return self.data["created"]
-    
-    @property
-    def created_utc(self):
-        return self.data["created_utc"]
-    
     @property
     def created_datetime(self):
         return self._handle_timestamp(self.data["created"])
