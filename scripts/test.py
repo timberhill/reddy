@@ -10,28 +10,25 @@ from modules import load_posts, plot_submission_frequency_histogram_2020, plot_s
 
 
 if __name__ == "__main__":
-
-    subreddit_name = "unitedkingdom"
+    subreddit_name = sys.argv[1] if len(sys.argv) == 2 else "skyrim"
 
     daterange = [
         datetime.utcnow().timestamp(),
         datetime(2020, 1, 1, 0, 0, 0).timestamp(),
     ]
 
-    papi  = PushshiftAPI()
-    rapi  = RedditAPI()
+    papi = PushshiftAPI()
+    rapi = RedditAPI()
 
-    # load_posts(subreddit_name, daterange, papi, rapi)
+    load_posts(subreddit_name, daterange, papi, rapi)
 
     with DataContext() as context:
         posts = context.select_posts(subreddit_name=subreddit_name, include_removed=False)
     
-    print(f"> Fetched {len(posts)} posts.")
-    
     if len(posts) == 0:
         raise RuntimeError("No posts in the database")
 
-    f, ax = plot_submission_time_histogram(f"Posts from r/{subreddit_name}", posts, metric="success", success_score=100, utc=False)
+    f, ax = plot_submission_time_histogram(f"Posts from r/{subreddit_name}", posts, metric="success", success_score=500, utc=True)
     plt.show()
 
     f, ax = plot_submission_frequency_histogram_2020(f"Posts from r/{subreddit_name}", posts, upvote_limits=[0, 50])
