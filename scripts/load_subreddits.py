@@ -10,7 +10,7 @@ if __name__ == "__main__":
         exit()
     elif len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
         subreddits = open(sys.argv[1], "r").read().split("\n")
-        subreddits = [x for x in subreddits if x != ""] # remove empty
+        subreddits = [x for x in subreddits if x != "" and x.strip()[0] != "#"] # remove empty
     else:
         subreddits = sys.argv[1:]
 
