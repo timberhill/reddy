@@ -68,7 +68,6 @@ def send_request(request_function, retries=3, ignore_errors=False, wait=10):
     return result
 
 
-
 def load_posts(subreddit_name, epochrange, papi, rapi, progress=True):
     """
     Load post IDs between dates using Pushshift API and then load full info from Reddit API.
@@ -102,7 +101,7 @@ def load_posts(subreddit_name, epochrange, papi, rapi, progress=True):
                 ignore_errors=True
             )
 
-            if len(ps_posts) == 0:
+            if ps_posts is None or len(ps_posts) == 0:
                 oldest_epoch += epoch_diff
                 continue
 
@@ -144,7 +143,7 @@ def load_posts(subreddit_name, epochrange, papi, rapi, progress=True):
                         f"{percentage:.1f}% " + \
                         f"Posts: {posts_loaded/1000:.1f}k. " + \
                         f"Oldest: {datetime.fromtimestamp(oldest_epoch)}. " + \
-                        f"ETA: {h:0.0f}h {m:0.0f}m {s:0.0f}s                             ",
+                        f"ETA: {h:0.0f}h {m:0.0f}m {s:0.0f}s    ",
                     end='\r')
 
             datacontext.commit()
