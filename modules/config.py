@@ -12,13 +12,12 @@ class Config:
 
 
     class __Config(object):
-        def __init__(self, comment="#"):
-            self._default_path = "../modules/config-default.ini"
-            self._custom_path  = "../modules/config.ini"
+        def __init__(self, comment="#", path="../modules/config.ini"):
+            self._default_path = "../modules/config.ini"
             self.comment = comment
 
-            if os.path.isfile(self._custom_path):
-                self.path = self._custom_path
+            if os.path.isfile(path):
+                self.path = path
             else:
                 warnings.warn(f"Using default config file.", RuntimeWarning)
                 self.path = self._default_path

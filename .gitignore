@@ -1,6 +1,5 @@
 # config files
-modules/config.py
-credentials.py
+modules/config.ini
 
 # defult database path
 data/reddy.db
