@@ -5,5 +5,6 @@ from .containers import RedditPost
 
 from .lockdown_start import load_national_lockdown_list
 
-from .plotters import *
+from .plot import Plot
+from .bin import Bin
 from .utilities import *

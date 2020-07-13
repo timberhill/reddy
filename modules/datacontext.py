@@ -1,5 +1,6 @@
 import os
 import sys
+import pandas as pd
 
 from sqlalchemy import create_engine, Column, ForeignKey, Integer, Float, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -110,7 +111,7 @@ class DataContext(object):
                     existing = self._update_post_entry(existing, post)
 
 
-    def select_posts(self, subreddit_name=None, daterange=None, utc=True, include_removed=True):
+    def select_posts(self, subreddit_name=None, daterange=None, utc=True, include_removed=True, pandas=True):
         """
         Select and filter posts.
         """
@@ -135,7 +136,10 @@ class DataContext(object):
         
         query = query.order_by(Post.created_utc)
 
-        return [self._post_entry_to_model(entry) for entry in query.all()]
+        if pandas:
+            return pd.read_sql(query.statement, self.session.bind) 
+        else:
+            return [self._post_entry_to_model(entry) for entry in query.all()]
 
 
     def _update_post_entry(self, target, source):
