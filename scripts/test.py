@@ -24,13 +24,13 @@ if __name__ == "__main__":
 
 
     print("Binning...  ", end="", flush=True)
-    bins, values = Bin.comments(
+    bins, values = Bin.posts(
         posts,
         start   = datetime(2019, 1, 1, 0, 0, 0),
         end     = datetime(2019, 7, 1, 0, 0, 0),
         binsize = timedelta(days=7),
         step    = timedelta(days=1),
-        per_post= True
+        # per_post= True
     )
     print("done")
     bins -= bins[0]
@@ -40,19 +40,18 @@ if __name__ == "__main__":
 
 
     print("Binning...  ", end="", flush=True)
-    bins, values = Bin.comments(
+    bins, values = Bin.posts(
         posts,
         start   = datetime(2020, 1, 1, 0, 0, 0),
         end     = datetime(2020, 7, 1, 0, 0, 0),
         binsize = timedelta(days=7),
         step    = timedelta(days=1),
-        per_post= True
+        # per_post= True
     )
     print("done")
     bins -= bins[0]
     bins /= timedelta(days=30).total_seconds()
     # values = np.array(values) / np.median(values[5:20])
     plt.plot(bins, values)
-
 
     plt.show()

@@ -12,6 +12,8 @@ class Bin(object):
 
     # TODO: implement median instead of mean (currently just dividing by N)
 
+    # TODO: handle division by zero is upvote_ratio is 0 
+
     @staticmethod
     def _prepare_arguments(posts_data, binsize, start, end, step, utc):
         def _handle_time(value):
@@ -39,9 +41,9 @@ class Bin(object):
 
         if step is not None: # running value (overlapping bins)
             step = _handle_time(step)
-            bins = np.arange(start, end+step, step)
+            bins = np.arange(start, end, step)
         else: # proper non-overlapping bins
-            bins = np.arange(start, end+binsize, binsize)
+            bins = np.arange(start, end, binsize)
         
         created_data = posts_data["created_utc"].to_numpy() if utc else posts_data["created"].to_numpy()
 

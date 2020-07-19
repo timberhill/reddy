@@ -15,8 +15,8 @@ if __name__ == "__main__":
         subreddits = sys.argv[1:]
 
     daterange = [
-        datetime(2020, 7, 1, 0, 0, 0).timestamp(),
         datetime(2020, 1, 1, 0, 0, 0).timestamp(),
+        datetime(2019, 7, 1, 0, 0, 0).timestamp(),
     ]
 
     papi = PushshiftAPI()
