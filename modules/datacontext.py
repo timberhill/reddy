@@ -4,7 +4,7 @@ import pandas as pd
 
 from sqlalchemy import create_engine, Column, ForeignKey, Integer, Float, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker, load_only
 Base = declarative_base()
 
 from collections.abc import Iterable
@@ -111,15 +111,22 @@ class DataContext(object):
                     existing = self._update_post_entry(existing, post)
 
 
-    def select_posts(self, subreddit_name=None, daterange=None, utc=True, include_removed=True, pandas=True):
+    def select_posts(self, subreddit_name=None, daterange=None, columns=None, utc=True, include_removed=True, pandas=True):
         """
         Select and filter posts.
         """
         subreddit_name = subreddit_name.lower()
-        
         query = self.session.query(Post)
+
+        if columns is not None:
+            query = query.options(load_only(*columns))
+        
         if subreddit_name is not None:
             query = query.filter(Post.subreddit.has(name=subreddit_name))
+
+        if not include_removed:
+            query = query.filter(Post.removed == False)
+
         if daterange is not None:
             if utc:
                 if daterange[0] is not None:
@@ -131,8 +138,6 @@ class DataContext(object):
                     query = query.filter(Post.created >= daterange[0])
                 if daterange[1] is not None:
                     query = query.filter(Post.created <= daterange[1])
-        if not include_removed:
-            query = query.filter(Post.removed == False)
         
         query = query.order_by(Post.created_utc)
 

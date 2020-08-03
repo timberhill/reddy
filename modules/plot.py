@@ -53,7 +53,7 @@ class Plot(object):
         @ticker.FuncFormatter
         def _time_tick_formatter(x, pos):
             month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-            return month_names[x][0:3]
+            return month_names[int(x)][0:3]
 
         plt.style.use("../modules/reddy-timeseries.mplstyle")
 
