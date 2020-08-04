@@ -4,7 +4,7 @@ import pandas as pd
 
 from sqlalchemy import create_engine, Column, ForeignKey, Integer, Float, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker, load_only
+from sqlalchemy.orm import relationship, sessionmaker, load_only, Load
 Base = declarative_base()
 
 from collections.abc import Iterable
@@ -116,13 +116,13 @@ class DataContext(object):
         Select and filter posts.
         """
         subreddit_name = subreddit_name.lower()
-        query = self.session.query(Post)
+        query = self.session.query(Post, Subreddit).join(Subreddit)
 
         if columns is not None:
-            query = query.options(load_only(*columns))
+            query = query.options(Load(Post).load_only(*columns))
         
         if subreddit_name is not None:
-            query = query.filter(Post.subreddit.has(name=subreddit_name))
+            query = query.filter(Subreddit.name == subreddit_name)
 
         if not include_removed:
             query = query.filter(Post.removed == False)
@@ -140,7 +140,7 @@ class DataContext(object):
                     query = query.filter(Post.created <= daterange[1])
         
         query = query.order_by(Post.created_utc)
-
+        
         if pandas:
             return pd.read_sql(query.statement, self.session.bind) 
         else:
