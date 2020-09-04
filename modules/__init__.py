@@ -7,5 +7,5 @@ from .containers import RedditPost
 from .lockdown_start import load_national_lockdown_list
 
 from .plot import Plot
-from .bin import Bin
+from .bin import TimeBin, TimeOfDayBin
 from .utilities import *

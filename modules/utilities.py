@@ -4,6 +4,19 @@ import time
 
 from . import DataContext
 
+def time_to_unix(value):
+    """
+    Returns unix time or time difference in seconds.
+    """
+    if isinstance(value, datetime):
+        return value.timestamp()
+    elif isinstance(value, timedelta):
+        return value.total_seconds()
+    elif type(value) is float or type(value) is int:
+        return value
+    else:
+        raise ValueError(f"Invalid time format/value encountered: {value}.")
+
 
 def load_newest_posts(subreddit_name, rapi, cache, n=1000):
     """

@@ -4,6 +4,10 @@ from datetime import datetime
 from modules import PushshiftAPI, RedditAPI, load_posts
 
 
+#  [r/askreddit] 12.7% Posts: 995.5k. Oldest: 2020-02-06 09:24:07. ETA: 65h 41m 21s
+
+#  [r/teenagers] ... Oldest: 2019-07-21 17:05:12. ETA: 86h 9m 9s
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("No subreddits specified as commandline arguments. Exiting.")
@@ -15,8 +19,8 @@ if __name__ == "__main__":
         subreddits = sys.argv[1:]
 
     daterange = [
-        datetime(2020, 1, 1, 0, 0, 0).timestamp(),
-        datetime(2019, 7, 1, 0, 0, 0).timestamp(),
+        datetime(2020, 8, 1, 0, 0, 0).timestamp(),
+        datetime(2016, 1, 1, 0, 0, 0).timestamp(),
     ]
 
     papi = PushshiftAPI()

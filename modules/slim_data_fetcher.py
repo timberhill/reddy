@@ -1,5 +1,5 @@
 from .datacontext import DataContext
-from .bin import Bin
+from .bin import TimeBin
 from datetime import timedelta, datetime
 from pandas import concat
 

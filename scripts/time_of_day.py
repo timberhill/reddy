@@ -5,8 +5,8 @@ import sys, os
 sys.path.append(os.path.join(os.path.abspath(''), ".."))
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from modules import PushshiftAPI, RedditAPI, DataContext, SlimDataFetcher
-from modules import load_posts, TimeBin, Plot
+from modules import PushshiftAPI, RedditAPI, DataContext
+from modules import load_posts, TimeBin, TimeOfDayBin
 
 
 if len(sys.argv) != 2:
@@ -17,8 +17,8 @@ subreddit_name = sys.argv[1]
 
 # date range to download
 daterange = [
-    datetime(2020, 7, 10, 0, 0, 0).timestamp(),
-    datetime(2019, 1, 1, 0, 0, 0).timestamp(),
+    datetime.now().timestamp(),
+    (datetime.now() - timedelta(days=365/2)).timestamp(),
 ]
 
 columns = [
@@ -34,7 +34,7 @@ update_posts = False
 with DataContext() as context:
     posts = context.select_posts(
                 subreddit_name=subreddit_name,
-                # daterange=(daterange[1], daterange[0]),
+                daterange=(daterange[1], daterange[0]),
                 columns=columns,
                 include_removed=True
             )
@@ -46,21 +46,13 @@ with DataContext() as context:
 
 print(f"Fetched {len(posts)} posts.")
 
-years = [2020, 2019, 2018, 2017, 2016]
-f = plt.figure(figsize=(16, 8))
-for year in years:
-    t, v = TimeBin.posts(
-        posts,
-        start   = datetime(year, 1, 1, 0, 0, 0),
-        end     = datetime(year, 12, 31, 23, 59, 59),
-        binsize = timedelta(days=7),
-        step    = timedelta(days=1)
-    )
-    Plot.timeseries_yearly(t, v, year, accent=year==2020)
+bin_structure = list(TimeOfDayBin.comments(
+    posts,
+    binsize = timedelta(hours=1),
+    step    = timedelta(hours=0.1),
+    per_post=False
+))
 
-s = f.suptitle(f"r/{subreddit_name}", ha="left")
+for t, v in bin_structure:
+    plt.plot(t, v)
 plt.show()
-
-
-# TODO: do this for lockdown range:
-# https://stackoverflow.com/questions/8500700/how-to-plot-a-gradient-color-line-in-matplotlib

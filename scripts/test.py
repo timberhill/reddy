@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-from modules import DataContext, Bin
+from modules import DataContext, TimeBin
 
 
 if __name__ == "__main__":
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
 
     print("Binning...  ", end="", flush=True)
-    bins, values = Bin.posts(
+    bins, values = TimeBin.posts(
         posts,
         start   = datetime(2019, 1, 1, 0, 0, 0),
         end     = datetime(2019, 7, 1, 0, 0, 0),
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
 
     print("Binning...  ", end="", flush=True)
-    bins, values = Bin.posts(
+    bins, values = TimeBin.posts(
         posts,
         start   = datetime(2020, 1, 1, 0, 0, 0),
         end     = datetime(2020, 7, 1, 0, 0, 0),
