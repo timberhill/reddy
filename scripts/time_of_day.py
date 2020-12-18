@@ -18,7 +18,7 @@ subreddit_name = sys.argv[1]
 # date range to download
 daterange = [
     datetime.now().timestamp(),
-    (datetime.now() - timedelta(days=365/2)).timestamp(),
+    (datetime.now() - timedelta(days=120)).timestamp(),
 ]
 
 columns = [
@@ -50,9 +50,22 @@ bin_structure = list(TimeOfDayBin.comments(
     posts,
     binsize = timedelta(hours=1),
     step    = timedelta(hours=0.1),
-    per_post=False
+    per_post=True
 ))
 
+colours = (
+    "#F06543",
+    "#F07347",
+    "#F0814A",
+    "#F08F4E",
+    "#F09D51",
+    "#628B48",
+    "#7EA172",
+)
+
+f, ax = plt.subplots(7, 1, sharex=True, sharey=True, figsize=(10, 6))
+i = 0
 for t, v in bin_structure:
-    plt.plot(t, v)
+    ax[i].step(t, v, c=colours[i], where="post")
+    i += 1
 plt.show()

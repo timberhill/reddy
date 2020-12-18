@@ -46,8 +46,8 @@ with DataContext() as context:
 
 print(f"Fetched {len(posts)} posts.")
 
-years = [2020, 2019, 2018, 2017, 2016]
 f = plt.figure(figsize=(16, 8))
+years = [2020, 2019, 2018, 2017, 2016]
 for year in years:
     t, v = TimeBin.posts(
         posts,

@@ -19,7 +19,7 @@ if __name__ == "__main__":
         subreddits = sys.argv[1:]
 
     daterange = [
-        datetime(2020, 8, 1, 0, 0, 0).timestamp(),
+        datetime(2020, 11, 24, 0, 0, 0).timestamp(),
         datetime(2016, 1, 1, 0, 0, 0).timestamp(),
     ]
 
