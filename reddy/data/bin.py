@@ -1,7 +1,7 @@
 import numba
 import numpy as np
 from datetime import datetime, timedelta
-from .utilities import time_to_unix
+# from .utilities import time_to_unix
 
 
 class TimeBin(object):

@@ -1,5 +1,5 @@
 # config files
-modules/config.ini
+config.ini
 
 # defult database path
 data/reddy.db

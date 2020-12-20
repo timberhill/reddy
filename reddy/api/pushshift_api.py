@@ -5,21 +5,23 @@ from datetime import datetime, timedelta, timezone
 
 from .containers import PushShiftPost
 
+
 class PushshiftAPI(object):
     """
     Simple wrapper for some Pushshift API.
     See https://pushshift.io/api-parameters/ or https://github.com/pushshift/api
     """
-    def __init__(self):
-        self._header = { "User-Agent": "python:reddy:v0.1 (by /u/timberhilly)" }
 
+    def __init__(self):
+        self._header = {"User-Agent": "python:reddy:v0.1 (by /u/timberhilly)"}
 
     def _normalize_time_parameter(self, t, tolerance=10):
         if t is None:
             return ""
 
-        isnumber   = lambda t: isinstance(t, int) or isinstance(t, float)
-        tounixtime = lambda dt_obj: dt_obj.replace(tzinfo=timezone.utc).timestamp()
+        def isnumber(t): return isinstance(t, int) or isinstance(t, float)
+        def tounixtime(dt_obj): return dt_obj.replace(
+            tzinfo=timezone.utc).timestamp()
 
         if isnumber(t):
             # this is unix time
@@ -34,10 +36,10 @@ class PushshiftAPI(object):
         elif isinstance(t, tuple) and isnumber(t[0]) and isnumber(t[1]):
             pass
         else:
-            raise ValueError("Wrong value encountered in cache.select(t=???). Use datetime object or unix time, or a tuple.")
+            raise ValueError(
+                "Wrong value encountered in cache.select(t=???). Use datetime object or unix time, or a tuple.")
 
         return f"{t[0]}..{t[1]}"
-
 
     def search(self, subreddit, query=None, t=None, before=None, after=None, limit=500):
         """
@@ -46,7 +48,7 @@ class PushshiftAPI(object):
         subreddit, str: name of the subreddit.
 
         subreddit, str: search terms.
-        
+
         t, int/float/datetime/tuple: time or list of times as unix time or python datetime object in UTC (optional)
         """
         created_utc = self._normalize_time_parameter(t)
